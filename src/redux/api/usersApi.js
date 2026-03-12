@@ -1,47 +1,56 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-
-// Define a service using a base URL and expected endpoints
 export const usersApi = createApi({
   reducerPath: 'usersApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://jsonplaceholder.typicode.com/' }),
+
+  tagTypes: ['User'],
   endpoints: (build) => ({
 
-    // Get Users
+    // GET USERS
     getUsers: build.query({
       query: () => 'users',
+      providesTags: (result) =>
+        result
+          ? result.map(({ id }) => ({ type: 'User', id }))
+          : [{ type: 'User', id: 'LIST' }],
     }),
-    
-    // Add User
+
+    // ADD USER
     addUser: build.mutation({
       query: (user) => ({
         url: 'users',
         method: 'POST',
         body: user,
       }),
+      invalidatesTags: [{ type: 'User', id: 'LIST' }],
     }),
 
-    // Edit User
+    // EDIT USER
     editUser: build.mutation({
       query: (user) => ({
         url: `users/${user.id}`,
         method: 'PUT',
         body: user,
       }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'User', id }],
     }),
 
-    // Delete User
+    // DELETE USER
     deleteUser: build.mutation({
-      query: (userId) => ({
-        url: `users/${userId}`,
+      query: (id) => ({
+        url: `users/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: (result, error, id) => [{ type: 'User', id }],
     }),
 
-    }),
+  }),
+});
 
-})
-
-// Export hooks for usage in functional components, which are
-// auto-generated based on the defined endpoints
-export const { useGetUsersQuery, useAddUserMutation, useEditUserMutation, useDeleteUserMutation} = usersApi
+export const {
+  useGetUsersQuery,
+  useAddUserMutation,
+  useEditUserMutation,
+  useDeleteUserMutation,
+} = usersApi;
