@@ -33,10 +33,10 @@ const UserList = () => {
   };
 
   const handleSubmit = async () => {
-    console.log({ name, email, editId });
+    // console.log({ name, email, editId });
     
     if (!name || !email) return alert("Name and Email required");
- await addUser({ name, email }).unwrap();
+    // await addUser({ name, email }).unwrap();
     try {
       if (editId) {
         await editUser({ id: editId, name, email }).unwrap();
