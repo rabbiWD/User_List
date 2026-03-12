@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchUsers, addUser, editUser, deleteUser } from "../features/users/usersSlice";
+import React, { useState } from "react";
+import { useAddUserMutation, useDeleteUserMutation, useEditUserMutation, useGetUsersQuery } from "../redux/api/usersApi";
+
 
 const UserList = () => {
-  const dispatch = useDispatch();
-  const users = useSelector(state => state.users.users);
+ const {data: users = []} = useGetUsersQuery();
+
+ const [addUser] = useAddUserMutation();
+ const [editUser] = useEditUserMutation();
+ const [deleteUser] = useDeleteUserMutation();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [editId, setEditId] = useState(null);
-
-  useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
 
   const openAddModal = () => {
     setName("");
@@ -29,13 +28,13 @@ const UserList = () => {
     setModalOpen(true);
   }
 
-  const handleSubmit = () => {
-    if (!name || !email) return alert("Name and Email required");
+  const handleSubmit = async () => {
+    if (!name || !email) return alert("Name and Email required"); // toast er kaj korte hbe
 
     if(editId){
-      dispatch(editUser({ id: editId, name, email }));
+      await editUser({ id: editId, name, email });
     } else {
-      dispatch(addUser({ name, email }));
+      await addUser({ name, email });
     }
 
     setModalOpen(false);
@@ -53,17 +52,19 @@ const UserList = () => {
 
       <ul className="space-y-2">
         {users.map(user => (
-          <li key={user.id} className="flex justify-between items-center p-2 border rounded">
+          <li key={user.id} className="flex justify-between items-center p-2 border rounded ">
             <span>{user.name} ({user.email})</span>
             <div>
+
               <button 
                 onClick={() => openEditModal(user)}
                 className="bg-yellow-400 text-white px-2 py-1 rounded mr-2"
               >
                 Edit
               </button>
+
               <button 
-                onClick={() => dispatch(deleteUser(user.id))}
+                onClick={() => deleteUser(user.id)}
                 className="bg-red-500 text-white px-2 py-1 rounded"
               >
                 Delete
