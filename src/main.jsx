@@ -9,5 +9,6 @@ import UserList from './components/UserList.jsx'
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <UserList />
+    <App/>
   </Provider>
 )
